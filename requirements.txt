@@ -1,0 +1,5 @@
+aiogram
+environs
+asyncio
+eth_abi
+pymongo[tls,srv]

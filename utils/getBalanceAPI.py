@@ -53,11 +53,14 @@ async def get_balance(address):
     coins = []
     tokens = []
     total_value = float()
-    for i in result['data']['ethereum']['address'][0]['balances']:
-        if i['value'] != 0 and i['currency']['address'] == '-' and i['currency']['symbol'] == 'BNB':
-            i['currency']['address'] = i['currency']['address'].replace('-',
-                                                                        '0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c')
-        tokens.append(i['currency']['address'])
+    try:
+        for i in result['data']['ethereum']['address'][0]['balances']:
+            if i['value'] != 0 and i['currency']['address'] == '-' and i['currency']['symbol'] == 'BNB':
+                i['currency']['address'] = i['currency']['address'].replace('-',
+                                                                            '0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c')
+            tokens.append(i['currency']['address'])
+    except TypeError:
+        return 1, 0
 
     async with aiohttp.ClientSession() as session:
         tasks = []

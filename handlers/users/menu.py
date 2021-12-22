@@ -26,7 +26,11 @@ async def get_balance(message: Message):
                              '\n\nYou can change your wallet using "Wallet" button.')
     else:
         tokens, price = await getBalanceAPI.get_balance(data)
-        if not tokens or not price:
+        if tokens == 1 and price == 0:
+            await message.answer(f'Your wallet `{data}` is invalid. \n\nNote: only BSC wallets are allowed. '
+                                 f'\nYou can change your wallet using "Wallet" button.',
+                                 parse_mode=types.ParseMode.MARKDOWN)
+        elif not tokens or not price:
             await message.answer("No tokens found.")
         else:
             if len(tokens) > 25:

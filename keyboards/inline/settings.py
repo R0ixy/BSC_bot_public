@@ -1,13 +1,14 @@
-from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton, CallbackQuery, Message
-from utils.db_api.db_connection import DBCommands
-from aiogram import types
-from keyboards.default.cancel_button import cancel
-from states.feedback import Feedback
-from aiogram.dispatcher import FSMContext
-from data.config import ADMINS
-from keyboards.default.menu import menu
+from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton, CallbackQuery, Message, ParseMode
 from aiogram.dispatcher.filters import Text
+from aiogram.dispatcher import FSMContext
+
 from loader import dp
+from utils.db_api.db_connection import DBCommands
+from keyboards.default.cancel_button import cancel
+from keyboards.default.menu import menu
+from states.feedback import Feedback
+from data.config import ADMINS
+
 
 settings_buttons = InlineKeyboardMarkup(row_width=1).add(
     InlineKeyboardButton(text="Wallet", callback_data="wallet"),
@@ -33,7 +34,7 @@ async def wallet_info(callback_query: CallbackQuery):
     data = await DBCommands().get_wallet(callback_query.message.chat.id)
     if data:
         await callback_query.message.edit_text(f"You wallet is: `{data}`",
-                                               parse_mode=types.ParseMode.MARKDOWN, reply_markup=wallet_delete)
+                                               parse_mode=ParseMode.MARKDOWN, reply_markup=wallet_delete)
     else:
         await callback_query.message.edit_text("You have not added any wallet yet")
 

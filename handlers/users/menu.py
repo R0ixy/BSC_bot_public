@@ -1,15 +1,17 @@
-from loader import dp
+import math
+
+from aiogram import types
 from aiogram.types import Message, ChatActions
 from aiogram.dispatcher.filters import Text
 from aiogram.dispatcher import FSMContext
+from eth_abi import is_encodable
+
+from loader import dp
 from states.wallet_input import Form
 from utils import getBalanceAPI
 from utils.db_api.db_connection import DBCommands
-import math
-from aiogram import types
 from keyboards.inline.wallet_option import cancel, wallet_changing
 from keyboards.inline.settings import settings_buttons
-from eth_abi import is_encodable
 from keyboards.default.menu import menu
 
 
@@ -39,8 +41,7 @@ async def get_balance(message: Message):
             else:
                 await message.answer("\n\n".join(list(tokens)), disable_web_page_preview=True)
 
-            await message.answer("Amount of tokens: {amount}\nTotal value: {price}$".format(
-                amount=len(tokens), price=price))
+            await message.answer(f"Amount of tokens: {len(tokens)}\nTotal value: {price}$")
 
 
 @dp.message_handler(Text(equals='Wallet'), state=None)

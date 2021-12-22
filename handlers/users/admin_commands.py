@@ -1,11 +1,13 @@
-from loader import dp
+from asyncio import sleep
+
 from aiogram.types import Message
+from aiogram.dispatcher import FSMContext
+from aiogram.utils.exceptions import BotBlocked
+
+from loader import dp
 from data.config import ADMINS
 from states.admin import AdminState, DirectMessage
-from aiogram.dispatcher import FSMContext
 from utils.db_api.db_connection import DBCommands
-from aiogram.utils.exceptions import BotBlocked
-from asyncio import sleep
 
 
 @dp.message_handler(commands=['tell'], state=None)

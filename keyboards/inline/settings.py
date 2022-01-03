@@ -63,8 +63,9 @@ async def settings(message: Message, state: FSMContext):
 @dp.message_handler(state=Feedback.message)
 async def proceed_feedback(message: Message, state: FSMContext):
     for admin in ADMINS:
-        await dp.bot.send_message(admin, f'Сообщение от пользователя username: {message.from_user.username}'
-                                         f' id: `{message.from_user.id}`\n\n{message.text}')
+        await dp.bot.send_message(admin, f'Сообщение от пользователя \nusername: `{message.from_user.username}`'
+                                         f' \nid: `{message.from_user.id}`\n\n{message.text}',
+                                  parse_mode=ParseMode.MARKDOWN)
     await message.reply("Message sent to admins! You will receive answer soon!")
     await state.finish()
 

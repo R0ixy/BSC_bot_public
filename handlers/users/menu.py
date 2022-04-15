@@ -18,16 +18,16 @@ from keyboards.default.menu import menu
 @dp.message_handler(Text(equals='Get Balance'))
 async def get_balance(message: Message):
     await message.answer_chat_action(ChatActions.TYPING)
-    data = await DBCommands().get_wallet(message.from_user.id)
-    if not data:
+    data = await DBCommands().get_data(message.from_user.id)
+    if not data['wallet']:
         await message.answer('Please add your wallet first')
-    elif not is_encodable('address', data):
-        await message.answer(f'Please add a correct wallet. Your wallet "{data}" in invalid.'
+    elif not is_encodable('address', data['wallet']):
+        await message.answer(f'Please add a correct wallet. Your wallet "{data["wallet"]}" is invalid.'
                              '\n\nYou can change your wallet using "Wallet" button.')
     else:
         tokens, price = await getBalanceAPI.get_balance(data)
         if tokens == 1 and price == 0:
-            await message.answer(f'Your wallet `{data}` is invalid. \n\nNote: only BSC wallets are allowed. '
+            await message.answer(f'Your wallet `{data["wallet"]}` is invalid. \n\nNote: only BSC wallets are allowed. '
                                  f'\nYou can change your wallet using "Wallet" button.',
                                  parse_mode=types.ParseMode.MARKDOWN)
         elif not tokens or not price:
@@ -50,7 +50,7 @@ async def get_balance(message: Message):
 
 @dp.message_handler(Text(equals='Wallet'), state=None)
 async def add_wallet(message: Message):
-    data = await DBCommands().get_wallet(message.from_user.id)
+    data = (await DBCommands().get_data(message.from_user.id))['wallet']
     if data:
         await message.answer(f"You wallet is: `{data}`", parse_mode=types.ParseMode.MARKDOWN,
                              reply_markup=wallet_changing)
@@ -61,7 +61,7 @@ async def add_wallet(message: Message):
 
 @dp.message_handler(state=Form.wallet)
 async def save_wallet(message: Message, state: FSMContext):
-    if await DBCommands().get_wallet(message.from_user.id):
+    if (await DBCommands().get_data(message.from_user.id))['wallet']:
         await DBCommands().update_wallet(message.from_user.id, message.text)
     else:
         await DBCommands().insert_wallet(message.from_user.id, message.text)

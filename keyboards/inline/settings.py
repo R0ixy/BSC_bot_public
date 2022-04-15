@@ -12,6 +12,7 @@ from data.config import ADMINS
 
 settings_buttons = InlineKeyboardMarkup(row_width=1).add(
     InlineKeyboardButton(text="Wallet", callback_data="wallet"),
+    InlineKeyboardButton(text="Tokens visibility", callback_data="visibility"),
     InlineKeyboardButton(text="Feedback", callback_data="feedback"),
     InlineKeyboardButton(text="Bot information", callback_data="info"))
 
@@ -31,7 +32,7 @@ async def back(callback_query: CallbackQuery):
 @dp.callback_query_handler(text='wallet')
 async def wallet_info(callback_query: CallbackQuery):
     await callback_query.answer(cache_time=60)
-    data = await DBCommands().get_wallet(callback_query.message.chat.id)
+    data = (await DBCommands().get_data(callback_query.message.chat.id))['wallet']
     if data:
         await callback_query.message.edit_text(f"You wallet is: `{data}`",
                                                parse_mode=ParseMode.MARKDOWN, reply_markup=wallet_delete)

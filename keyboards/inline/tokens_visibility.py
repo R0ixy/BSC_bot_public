@@ -4,7 +4,7 @@ from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton, CallbackQu
 from eth_abi import is_encodable
 
 from loader import dp
-from utils import getBalanceAPI
+from utils import getBalanceAPI, analytics
 from utils.db_api.db_connection import DBCommands
 
 hide = InlineKeyboardMarkup().add(
@@ -21,8 +21,8 @@ async def tokens_visibility(callback_query: CallbackQuery):
 
     await callback_query.message.answer_chat_action(ChatActions.TYPING)
     data = await DBCommands().get_data(callback_query.message.chat.id)
-    if not data['wallet']:
-        await callback_query.message.answer('Please add your wallet first')
+    if not data:
+        await callback_query.message.answer('Error! No wallet found.\nPlease add your wallet first')
     elif not is_encodable('address', data['wallet']):
         await callback_query.message.answer(f'Please add a correct wallet. Your wallet "{data["wallet"]}" in invalid.'
                                             '\n\nYou can change your wallet using "Wallet" button.')
@@ -45,6 +45,10 @@ async def tokens_visibility(callback_query: CallbackQuery):
                     await callback_query.message.answer(token['data'],
                                                         disable_web_page_preview=True,
                                                         reply_markup=show)
+
+    await analytics.send_analytics(user_id=callback_query.message.chat.id,
+                                   user_lang_code=callback_query.from_user.language_code,
+                                   action_name='tokens_visibility')
 
 
 @dp.callback_query_handler(text='hide')

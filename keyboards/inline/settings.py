@@ -3,6 +3,7 @@ from aiogram.dispatcher.filters import Text
 from aiogram.dispatcher import FSMContext
 
 from loader import dp
+from utils import analytics
 from utils.db_api.db_connection import DBCommands
 from keyboards.default.cancel_button import cancel
 from keyboards.default.menu import menu
@@ -32,12 +33,12 @@ async def back(callback_query: CallbackQuery):
 @dp.callback_query_handler(text='wallet')
 async def wallet_info(callback_query: CallbackQuery):
     await callback_query.answer(cache_time=60)
-    data = (await DBCommands().get_data(callback_query.message.chat.id))['wallet']
+    data = (await DBCommands().get_data(callback_query.message.chat.id))
     if data:
-        await callback_query.message.edit_text(f"You wallet is: `{data}`",
+        await callback_query.message.edit_text(f"You wallet is: `{data['wallet']}`",
                                                parse_mode=ParseMode.MARKDOWN, reply_markup=wallet_delete)
     else:
-        await callback_query.message.edit_text("You have not added any wallet yet")
+        await callback_query.message.edit_text("You have not added any wallet yet", reply_markup=go_back)
 
 
 @dp.callback_query_handler(text='delete_wallet')
@@ -46,6 +47,10 @@ async def delete_wallet(callback_query: CallbackQuery):
     await DBCommands().delete(callback_query.message.chat.id)
     await callback_query.message.answer('Deleted')
 
+    await analytics.send_analytics(user_id=callback_query.message.chat.id,
+                                   user_lang_code=callback_query.from_user.language_code,
+                                   action_name='delete_wallet')
+
 
 @dp.callback_query_handler(text='feedback')
 async def feedback(callback_query: CallbackQuery):
@@ -53,6 +58,10 @@ async def feedback(callback_query: CallbackQuery):
     await callback_query.message.delete()
     await callback_query.message.answer('Input your message here and admin will receive it', reply_markup=cancel)
     await Feedback.message.set()
+
+    await analytics.send_analytics(user_id=callback_query.message.chat.id,
+                                   user_lang_code=callback_query.from_user.language_code,
+                                   action_name='feedback')
 
 
 @dp.message_handler(Text(equals='Cancel'), state=Feedback.message)
@@ -67,7 +76,7 @@ async def proceed_feedback(message: Message, state: FSMContext):
         await dp.bot.send_message(admin, f'Сообщение от пользователя \nusername: `{message.from_user.username}`'
                                          f' \nid: `{message.from_user.id}`\n\n{message.text}',
                                   parse_mode=ParseMode.MARKDOWN)
-    await message.reply("Message sent to admins! You will receive answer soon!")
+    await message.reply("Message sent to admins! You will receive answer soon!", reply_markup=menu)
     await state.finish()
 
 
@@ -79,3 +88,7 @@ async def get_info(callback_query: CallbackQuery):
                                            "to check the current balance of your wallet.\n\n"
                                            "All token prices are getting directly from https://pancakeswap.finance/ API"
                                            , disable_web_page_preview=True, reply_markup=go_back)
+
+    await analytics.send_analytics(user_id=callback_query.message.chat.id,
+                                   user_lang_code=callback_query.from_user.language_code,
+                                   action_name='bot_info')

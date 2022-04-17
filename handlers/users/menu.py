@@ -8,7 +8,7 @@ from eth_abi import is_encodable
 
 from loader import dp
 from states.wallet_input import Form
-from utils import getBalanceAPI
+from utils import getBalanceAPI, analytics
 from utils.db_api.db_connection import DBCommands
 from keyboards.inline.wallet_option import cancel, wallet_changing
 from keyboards.inline.settings import settings_buttons
@@ -19,7 +19,7 @@ from keyboards.default.menu import menu
 async def get_balance(message: Message):
     await message.answer_chat_action(ChatActions.TYPING)
     data = await DBCommands().get_data(message.from_user.id)
-    if not data['wallet']:
+    if data is None:
         await message.answer('Please add your wallet first')
     elif not is_encodable('address', data['wallet']):
         await message.answer(f'Please add a correct wallet. Your wallet "{data["wallet"]}" is invalid.'
@@ -47,10 +47,17 @@ async def get_balance(message: Message):
 
             await message.answer(f"Amount of tokens: {len(tokens)}\nTotal value: {price}$")
 
+    await analytics.send_analytics(user_id=message.from_user.id,
+                                   user_lang_code=message.from_user.language_code,
+                                   action_name='get_balance')
+
 
 @dp.message_handler(Text(equals='Wallet'), state=None)
 async def add_wallet(message: Message):
-    data = (await DBCommands().get_data(message.from_user.id))['wallet']
+    try:
+        data = (await DBCommands().get_data(message.from_user.id))['wallet']
+    except TypeError:
+        data = None
     if data:
         await message.answer(f"You wallet is: `{data}`", parse_mode=types.ParseMode.MARKDOWN,
                              reply_markup=wallet_changing)
@@ -58,10 +65,14 @@ async def add_wallet(message: Message):
         await message.answer('Input wallet address', reply_markup=cancel)
         await Form.wallet.set()
 
+    await analytics.send_analytics(user_id=message.from_user.id,
+                                   user_lang_code=message.from_user.language_code,
+                                   action_name='wallet')
+
 
 @dp.message_handler(state=Form.wallet)
 async def save_wallet(message: Message, state: FSMContext):
-    if (await DBCommands().get_data(message.from_user.id))['wallet']:
+    if await DBCommands().get_data(message.from_user.id):
         await DBCommands().update_wallet(message.from_user.id, message.text)
     else:
         await DBCommands().insert_wallet(message.from_user.id, message.text)
@@ -75,7 +86,15 @@ async def donate(message: Message):
                          "`0x54893d36926D95651Bf25f7B55DF328DB029Cb6b`"
                          "\n(Tap to copy)", parse_mode=types.ParseMode.MARKDOWN)
 
+    await analytics.send_analytics(user_id=message.from_user.id,
+                                   user_lang_code=message.from_user.language_code,
+                                   action_name='donate')
+
 
 @dp.message_handler(Text(equals='Settings'))
 async def settings(message: Message):
     await message.answer("Choose settings button", reply_markup=settings_buttons)
+
+    await analytics.send_analytics(user_id=message.from_user.id,
+                                   user_lang_code=message.from_user.language_code,
+                                   action_name='settings')

@@ -63,7 +63,6 @@ async def get_balance(address_data):
                     tokens.append(i)
             except KeyError:
                 tokens.append(i)
-                # tokens.append(i['currency']['address'])
     except TypeError:
         return 1, 0
 
@@ -73,8 +72,6 @@ async def get_balance(address_data):
             tasks.append(get_price(session=session, coin=c['currency']['address']))
         prices = await asyncio.gather(*tasks, return_exceptions=True)
 
-
-    # for i, price in zip(result['data']['ethereum']['address'][0]['balances'], prices):
     for i, price in zip(tokens, prices):
         if i['value'] != 0:
 
@@ -104,7 +101,6 @@ async def get_all_tokens(address_data):
     result = await run_query(variables)  # Execute the query
 
     coins = []
-    # tokens = []
     total_value = float()
     visible = []
     try:
@@ -125,7 +121,6 @@ async def get_all_tokens(address_data):
 
     async with aiohttp.ClientSession() as session:
         tasks = []
-        # for c in tokens:
         for c in result['data']['ethereum']['address'][0]['balances']:
             tasks.append(get_price(session=session, coin=c['currency']['address']))
         prices = await asyncio.gather(*tasks, return_exceptions=True)

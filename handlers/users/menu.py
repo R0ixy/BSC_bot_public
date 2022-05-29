@@ -84,7 +84,8 @@ async def save_wallet(message: Message, state: FSMContext):
 async def donate(message: Message):
     await message.answer("Donate BNB or BEP-20 tokens to support us. BSC address: "
                          "`0x54893d36926D95651Bf25f7B55DF328DB029Cb6b`"
-                         "\n(Tap to copy)", parse_mode=types.ParseMode.MARKDOWN)
+                         "\n(Tap to copy)"
+                         "\n\n Buy me coffee: https://ko-fi.com/r0ixy", parse_mode=types.ParseMode.MARKDOWN)
 
     await analytics.send_analytics(user_id=message.from_user.id,
                                    user_lang_code=message.from_user.language_code,

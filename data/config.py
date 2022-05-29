@@ -2,7 +2,7 @@ import os
 
 
 BOT_TOKEN = os.environ.get('BOT_TOKEN')
-ADMINS = os.environ.get('ADMINS')
+ADMIN = os.environ.get('ADMIN')
 DB_USER = os.environ.get('DB_USER')
 DB_PASSWORD = os.environ.get('DB_PASSWORD')
 APIKEY = os.environ.get('APIKEY')

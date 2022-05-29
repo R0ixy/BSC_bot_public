@@ -8,8 +8,7 @@ from utils.db_api.db_connection import DBCommands
 from keyboards.default.cancel_button import cancel
 from keyboards.default.menu import menu
 from states.feedback import Feedback
-from data.config import ADMINS
-
+from data.config import ADMIN
 
 settings_buttons = InlineKeyboardMarkup(row_width=1).add(
     InlineKeyboardButton(text="Wallet", callback_data="wallet"),
@@ -72,10 +71,9 @@ async def settings(message: Message, state: FSMContext):
 
 @dp.message_handler(state=Feedback.message)
 async def proceed_feedback(message: Message, state: FSMContext):
-    for admin in ADMINS:
-        await dp.bot.send_message(admin, f'Сообщение от пользователя \nusername: `{message.from_user.username}`'
-                                         f' \nid: `{message.from_user.id}`\n\n{message.text}',
-                                  parse_mode=ParseMode.MARKDOWN)
+    await dp.bot.send_message(ADMIN, f'Сообщение от пользователя \nusername: `{message.from_user.username}`'
+                                     f' \nid: `{message.from_user.id}`\n\n{message.text}',
+                              parse_mode=ParseMode.MARKDOWN)
     await message.reply("Message sent to admins! You will receive answer soon!", reply_markup=menu)
     await state.finish()
 

@@ -5,18 +5,16 @@ from aiogram.dispatcher import FSMContext
 from aiogram.utils.exceptions import BotBlocked
 
 from loader import dp
-from data.config import ADMINS
+from data.config import ADMIN
 from states.admin import AdminState, DirectMessage
 from utils.db_api.db_connection import DBCommands
 
 
 @dp.message_handler(commands=['tell'], state=None)
 async def get_message(message: Message):
-    for admin in ADMINS:
-        if message.from_user.id == int(admin):
-
-            await message.answer('Введите сообщение: ')
-            await AdminState.message.set()
+    if message.from_user.id == int(ADMIN):
+        await message.answer('Введите сообщение: ')
+        await AdminState.message.set()
 
 
 @dp.message_handler(state=AdminState.message)
@@ -34,10 +32,9 @@ async def send_everyone(message: Message, state: FSMContext):
 
 @dp.message_handler(commands=['tellone'], state=None)
 async def get_id(message: Message):
-    for admin in ADMINS:
-        if message.from_user.id == int(admin):
-            await message.answer('Введите id')
-            await DirectMessage.id.set()
+    if message.from_user.id == int(ADMIN):
+        await message.answer('Введите id')
+        await DirectMessage.id.set()
 
 
 @dp.message_handler(state=DirectMessage.id)

@@ -1,14 +1,26 @@
-from environs import Env
+import os
+from dotenv import load_dotenv
 
-env = Env()
-env.read_env()
+load_dotenv()
 
-BOT_TOKEN = env.str('BOT_TOKEN')
-ADMINS = env.list('ADMINS')
-DB_USER = env.str('DB_USER')
-DB_PASSWORD = env.str('DB_PASSWORD')
-APIKEY = env.str('APIKEY')
+BOT_TOKEN = os.environ.get('BOT_TOKEN')
+ADMINS = os.environ.get('ADMINS')
+DB_USER = os.environ.get('DB_USER')
+DB_PASSWORD = os.environ.get('DB_PASSWORD')
+APIKEY = os.environ.get('APIKEY')
 
 # Analytics
-MEASUREMENT_ID = env.str('MEASUREMENT_ID')
-API_SECRET = env.str('API_SECRET')
+MEASUREMENT_ID = os.environ.get('MEASUREMENT_ID')
+API_SECRET = os.environ.get('API_SECRET')
+
+# heroku
+HEROKU_APP_NAME = os.environ.get('HEROKU_APP_NAME')
+
+# webhook settings
+WEBHOOK_HOST = f'https://{HEROKU_APP_NAME}.herokuapp.com'
+WEBHOOK_PATH = f'/webhook/{BOT_TOKEN}'
+WEBHOOK_URL = f'{WEBHOOK_HOST}{WEBHOOK_PATH}'
+
+# webserver settings
+WEBAPP_HOST = '0.0.0.0'
+WEBAPP_PORT = os.getenv('PORT', default=8000)

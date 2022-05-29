@@ -1,5 +1,5 @@
 aiogram
-environs
+dotenv
 asyncio
 eth_abi
 pymongo[tls,srv]

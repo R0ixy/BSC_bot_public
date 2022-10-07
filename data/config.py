@@ -11,11 +11,11 @@ APIKEY = os.environ.get('APIKEY')
 MEASUREMENT_ID = os.environ.get('MEASUREMENT_ID')
 API_SECRET = os.environ.get('API_SECRET')
 
-# heroku
-HEROKU_APP_NAME = os.environ.get('HEROKU_APP_NAME')
+# host
+HOST_NAME = os.environ.get('HOST_NAME')
 
 # webhook settings
-WEBHOOK_HOST = f'https://{HEROKU_APP_NAME}.herokuapp.com'
+WEBHOOK_HOST = f'https://{HOST_NAME}'
 WEBHOOK_PATH = f'/webhook/{BOT_TOKEN}'
 WEBHOOK_URL = f'{WEBHOOK_HOST}{WEBHOOK_PATH}'
 
